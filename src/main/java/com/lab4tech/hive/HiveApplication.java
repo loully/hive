@@ -17,13 +17,6 @@ public class HiveApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HiveApplication.class, args);
-
-		List<Integer> data = new ArrayList<>();
-		IntStream.range(0,100).parallel().forEach(s -> {
-				synchronized(data){
-				data.add(s);
-		}});
-		System.out.println(data.size());
 	}
 
 }
