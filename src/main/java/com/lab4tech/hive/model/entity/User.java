@@ -1,4 +1,4 @@
-package com.lab4tech.hive.com.lab4tech.hive.model.entity;
+package com.lab4tech.hive.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,8 +18,8 @@ public class User {
     String city;
 
     byte birthYear;
-    @Column(nullable = false, unique = true)
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
