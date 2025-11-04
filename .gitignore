@@ -19,6 +19,8 @@ target/
 *.iml
 *.ipr
 
-
 ## Ignore Sandbox project## 
 /src/main/java/com/lab4tech/sandbox/
+
+##ignore application properties data
+src/main/resources/application.properties
