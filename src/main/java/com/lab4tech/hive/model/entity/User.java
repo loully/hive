@@ -3,8 +3,10 @@ package com.lab4tech.hive.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
 @Entity
+@Table(name="users")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -13,11 +15,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+/*
+    Optional fields
     String firstname;
 
     String city;
 
     byte birthYear;
+    */
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -25,7 +30,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // avoid changing order issues
     @Column(nullable = false)
     private Role role;
 
