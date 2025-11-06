@@ -1,5 +1,7 @@
 package com.lab4tech.hive.repository;
 
+import com.lab4tech.hive.controller.dto.UserRequest;
+import com.lab4tech.hive.controller.dto.UserResponse;
 import com.lab4tech.hive.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
