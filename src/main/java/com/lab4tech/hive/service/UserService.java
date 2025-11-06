@@ -8,6 +8,10 @@ import com.lab4tech.hive.model.entity.AppUser;
 import com.lab4tech.hive.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -44,7 +48,7 @@ public class UserService {
     public UserResponse saveUser(UserRequest userRequest){
         AppUser appUser = new AppUser();
         appUser.setEmail(userRequest.email());
-        appUser.setPassword(userRequest.password());
+        appUser.setPassword(bCryptPasswordEncoder.encode(userRequest.password()));
         appUser.setRole(userRequest.role());
         if(userRepository.findByEmail(appUser.getEmail()).isPresent()){
             throw new UserAlreadyExistsException(userRequest.email());
@@ -80,5 +84,15 @@ public class UserService {
     public void deleteUser(long id){
         AppUser foundAppUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         userRepository.delete(foundAppUser);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        AppUser userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("The user with email "+email+" is not found"));
+        return User.withUsername(userEntity.getEmail())
+                .password(userEntity.getPassword())
+                .roles(userEntity.getRole().name())
+                .build();
     }
 }
