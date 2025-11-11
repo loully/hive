@@ -39,4 +39,18 @@ public class SkillService {
         List<SkillResponse>result = skillRepository.findAll().stream().map((skill) -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList());
         return result;
     }
+
+    public SkillResponse updateSkill(int id, SkillRequest request){
+        Skill foundSkill = skillRepository.findById(id).orElseThrow(() -> new SkillNotFoundException(id));
+        if(request.name() != null && !request.name().isBlank()) foundSkill.setName(request.name());
+        if(request.description() != null && !request.description().isBlank()) foundSkill.setDescription(request.description());
+        // Dirty check by JPA hibernate -- replace the request.name().equals(foundSkill.getName())
+        Skill updateSkill = skillRepository.save(foundSkill);
+        return new SkillResponse(updateSkill.getId(), updateSkill.getName(), updateSkill.getDescription());
+    }
+
+    public void deleteSkillById(int id){
+        Skill result = skillRepository.findById(id).orElseThrow(() -> new SkillNotFoundException(id));
+        skillRepository.delete(result);
+    }
 }
