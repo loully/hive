@@ -25,4 +25,8 @@ public class AppUser {
     @Column(nullable = false)
     private Role role;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "volunteerprofile_id", referencedColumnName = "id")
+    private VolunteerProfile volunteerProfile;
+
 }

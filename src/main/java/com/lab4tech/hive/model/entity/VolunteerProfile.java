@@ -30,4 +30,7 @@ public class VolunteerProfile {
 
     @Column
     private String city;
+
+    @OneToOne(mappedBy = "volunteerProfile")
+    private AppUser appuser;
 }
