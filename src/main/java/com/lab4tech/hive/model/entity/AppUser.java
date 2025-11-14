@@ -15,15 +15,6 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-/*
-    Optional fields
-    String firstname;
-
-    String city;
-
-    byte birthYear;
-    */
-
     @Column(nullable = false, unique = true)
     private String email;
 

@@ -7,8 +7,6 @@ import com.lab4tech.hive.exception.SkillNotFoundException;
 import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
