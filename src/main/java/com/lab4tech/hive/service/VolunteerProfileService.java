@@ -3,7 +3,9 @@ package com.lab4tech.hive.service;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
+import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
+import com.lab4tech.hive.repository.SkillRepository;
 import com.lab4tech.hive.repository.VolunteerProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class VolunteerProfileService {
     //injection dependance of repository
     private final VolunteerProfileRepository volunteerRepo;
+    private final SkillRepository skillRepository;
 
     public VolunteerResponse createVolunteerProfile(VolunteerRequest request) {
         if(volunteerRepo.findByFirstnameAndLastname(request.firstname(), request.lastname()).isPresent())
@@ -25,19 +28,25 @@ public class VolunteerProfileService {
         VolunteerProfile createdVolunteer = new VolunteerProfile();
         createdVolunteer.setFirstname(request.firstname());
         createdVolunteer.setLastname(request.lastname());
-        if(!createdVolunteer.getPhoneNumber().isBlank()) createdVolunteer.setPhoneNumber(request.phoneNumber());
-        if(!createdVolunteer.getCity().isBlank()) createdVolunteer.setCity(request.city());
+        if(createdVolunteer.getPhoneNumber() != null) createdVolunteer.setPhoneNumber(request.phoneNumber());
+        if(createdVolunteer.getCity() != null) createdVolunteer.setCity(request.city());
+        if(request.skillIds() != null && !request.skillIds().isEmpty()){
+            List<Skill> skills = skillRepository.findAllById(request.skillIds());
+            createdVolunteer.setSkills(skills);
+        }
         createdVolunteer = volunteerRepo.save(createdVolunteer);
         return new VolunteerResponse(
                 createdVolunteer.getId(),
                 createdVolunteer.getFirstname(),
                 createdVolunteer.getLastname(),
-                createdVolunteer.getCity());
+                createdVolunteer.getCity(),
+                createdVolunteer.getSkills()
+        );
     }
 
     public VolunteerResponse getVolunteerProfile(long id){
         VolunteerProfile volunteer = volunteerRepo.findById(id).orElseThrow(() -> new VolunteerProfileNotFoundException("id="+id));
-        return new VolunteerResponse(volunteer.getId(), volunteer.getFirstname(), volunteer.getLastname(), volunteer.getCity());
+        return new VolunteerResponse(volunteer.getId(), volunteer.getFirstname(), volunteer.getLastname(), volunteer.getCity(), volunteer.getSkills());
     }
 
     public void deleleteVolunteerProfile(Long id) {
@@ -52,7 +61,8 @@ public class VolunteerProfileService {
                         volunteerProfile.getId(),
                         volunteerProfile.getFirstname(),
                         volunteerProfile.getLastname(),
-                        volunteerProfile.getCity()))
+                        volunteerProfile.getCity(),
+                        volunteerProfile.getSkills()))
                 .collect(Collectors.toList());
 
         return allVolunteerProfiles;
@@ -60,24 +70,17 @@ public class VolunteerProfileService {
 
     public VolunteerResponse updateVolunteerProfile(Long id, VolunteerRequest request) {
         VolunteerProfile volunteerProfile = volunteerRepo.findById(id).orElseThrow(() -> new VolunteerProfileNotFoundException("id="+id+", firstname="+request.firstname()+", lastname="+request.lastname()));
-        System.out.println("Service -- update\n");
-        System.out.println("Volunteer profile found in repository >> firstname:"+volunteerProfile.getFirstname()+" , lastname:"+volunteerProfile.getLastname());
-/*        if(request.firstname() != null ) volunteerProfile.setFirstname(request.firstname());
-        if(request.lastname() != null && !request.lastname().isBlank()) volunteerProfile.setLastname(request.lastname());*/
         if(request.phoneNumber() != null ) volunteerProfile.setPhoneNumber(request.phoneNumber());
         if(request.city() != null ) volunteerProfile.setCity(request.city());
-
-        System.out.println("update -- volunteerProfile \n" +
-                "firstname: "+volunteerProfile.getFirstname()
-                +" lastname: "+volunteerProfile.getLastname()
-                + " phoneNumber: "+volunteerProfile.getPhoneNumber());
 
         VolunteerProfile saveVolunteerProfile = volunteerRepo.save(volunteerProfile);
         return new VolunteerResponse(
                 saveVolunteerProfile.getId(),
                 saveVolunteerProfile.getFirstname(),
                 saveVolunteerProfile.getLastname(),
-                saveVolunteerProfile.getCity());
+                saveVolunteerProfile.getCity(),
+                saveVolunteerProfile.getSkills()
+        );
     }
 
 }

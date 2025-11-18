@@ -1,18 +1,19 @@
 package com.lab4tech.hive.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Setter
 @Getter
-@Table (name = "volunteer-profile")
+@Table (name = "volunteer_profile")
 public class VolunteerProfile {
 
     @Id
@@ -33,4 +34,12 @@ public class VolunteerProfile {
 
     @OneToOne(mappedBy = "volunteerProfile")
     private AppUser appuser;
+
+    @ManyToMany
+    @JoinTable(
+            name = "volunteer_skill",
+            joinColumns = @JoinColumn(name = "volunteer_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private List<Skill> skills;
 }

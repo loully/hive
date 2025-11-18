@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection to REST API ** Should handle it with classical frontend **
                 .httpBasic(Customizer.withDefaults()) // Disable default config
                 .authorizeHttpRequests(authorize -> authorize   // Conf HTTP request authorisations
-                        .requestMatchers(HttpMethod.POST,"/users").permitAll()  // authorize all requests post / get
+                        .requestMatchers(HttpMethod.GET,"/users/**").permitAll()  // authorize all requests post / get
+                        .requestMatchers(HttpMethod.POST,"/users/**").permitAll()  // authorize all requests post / get
                         .requestMatchers("/volunteers/**").permitAll()  // authorize all requests post / get
                         .requestMatchers("/skills/**").permitAll()  // authorize all requests post / get
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN") // authorize admin for delete
