@@ -3,6 +3,7 @@ package com.lab4tech.hive.service;
 import com.lab4tech.hive.controller.dto.SkillResponse;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
+import com.lab4tech.hive.exception.VolunteerProfileAlreadyExistsException;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
 import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ public class VolunteerProfileService {
 
     public VolunteerResponse createVolunteerProfile(VolunteerRequest request) {
         if(volunteerRepo.findByFirstnameAndLastname(request.firstname(), request.lastname()).isPresent())
-            throw new VolunteerProfileNotFoundException(Strings.concat(request.firstname(), request.lastname()));
+            throw new VolunteerProfileAlreadyExistsException(Strings.concat(request.firstname(), request.lastname()));
         VolunteerProfile createdVolunteer = new VolunteerProfile();
         createdVolunteer.setFirstname(request.firstname());
         createdVolunteer.setLastname(request.lastname());
@@ -36,23 +36,12 @@ public class VolunteerProfileService {
             createdVolunteer.setSkills(skills);
         }
         createdVolunteer = volunteerRepo.save(createdVolunteer);
-        return new VolunteerResponse(
-                createdVolunteer.getId(),
-                createdVolunteer.getFirstname(),
-                createdVolunteer.getLastname(),
-                createdVolunteer.getCity(),
-                createdVolunteer.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList())
-        );
+        return mapToVolunteerResponse(createdVolunteer);
     }
 
     public VolunteerResponse getVolunteerProfile(long id){
         VolunteerProfile volunteer = volunteerRepo.findById(id).orElseThrow(() -> new VolunteerProfileNotFoundException("id="+id));
-        return new VolunteerResponse(
-                volunteer.getId(),
-                volunteer.getFirstname(),
-                volunteer.getLastname(),
-                volunteer.getCity(),
-                volunteer.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList()));
+        return mapToVolunteerResponse(volunteer);
     }
 
     public void deleleteVolunteerProfile(Long id) {
@@ -63,12 +52,7 @@ public class VolunteerProfileService {
     public List<VolunteerResponse> getAllVolunteerProfiles() {
         List<VolunteerResponse> allVolunteerProfiles = volunteerRepo.findAll()
                 .stream()
-                .map(volunteerProfile -> new VolunteerResponse(
-                        volunteerProfile.getId(),
-                        volunteerProfile.getFirstname(),
-                        volunteerProfile.getLastname(),
-                        volunteerProfile.getCity(),
-                        volunteerProfile.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList())))
+                .map(this::mapToVolunteerResponse)
                 .collect(Collectors.toList());
 
         return allVolunteerProfiles;
@@ -83,16 +67,33 @@ public class VolunteerProfileService {
             List<Skill> newSkills = skillRepository.findAllById(request.skillIds());
             volunteerProfile.setSkills(newSkills);
         }
-
         VolunteerProfile saveVolunteerProfile = volunteerRepo.save(volunteerProfile);
-        List<SkillResponse> skillsDTO = saveVolunteerProfile.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList());
+        return mapToVolunteerResponse(saveVolunteerProfile);
+    }
+
+    /*************************
+     ** Utilitary functions **
+     *************************/
+
+    private VolunteerResponse mapToVolunteerResponse(VolunteerProfile volunteer) {
+        List<SkillResponse> volunteerSkillsResponse = mapToSkillResponseList(volunteer.getSkills());
         return new VolunteerResponse(
-                saveVolunteerProfile.getId(),
-                saveVolunteerProfile.getFirstname(),
-                saveVolunteerProfile.getLastname(),
-                saveVolunteerProfile.getCity(),
-                skillsDTO
+                volunteer.getId(),
+                volunteer.getFirstname(),
+                volunteer.getLastname(),
+                volunteer.getCity(),
+                volunteerSkillsResponse
         );
+    }
+
+    private List<SkillResponse> mapToSkillResponseList(List<Skill> skills){
+        return skills.stream()
+                .map(skill ->
+                        new SkillResponse(
+                                skill.getId(),
+                                skill.getName(),
+                                skill.getDescription()))
+                .collect(Collectors.toList());
     }
 
 }

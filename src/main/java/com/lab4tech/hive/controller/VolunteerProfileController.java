@@ -48,7 +48,6 @@ public class VolunteerProfileController {
     //Update
     @PutMapping("/{id}")
     public ResponseEntity<VolunteerResponse> updateVolunteerProfile(@PathVariable Long id, @RequestBody VolunteerRequest request){
-        System.out.println("controller request >> fisrtname: "+ request.firstname()+" , lastname"+request.lastname() );
         VolunteerResponse volunteerResponse = volunteerProfileService.updateVolunteerProfile(id, request);
         return new ResponseEntity<>(volunteerResponse, HttpStatus.OK);
     }
