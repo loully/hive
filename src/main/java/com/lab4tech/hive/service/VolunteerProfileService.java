@@ -1,5 +1,6 @@
 package com.lab4tech.hive.service;
 
+import com.lab4tech.hive.controller.dto.SkillResponse;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
@@ -40,13 +41,18 @@ public class VolunteerProfileService {
                 createdVolunteer.getFirstname(),
                 createdVolunteer.getLastname(),
                 createdVolunteer.getCity(),
-                createdVolunteer.getSkills()
+                createdVolunteer.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList())
         );
     }
 
     public VolunteerResponse getVolunteerProfile(long id){
         VolunteerProfile volunteer = volunteerRepo.findById(id).orElseThrow(() -> new VolunteerProfileNotFoundException("id="+id));
-        return new VolunteerResponse(volunteer.getId(), volunteer.getFirstname(), volunteer.getLastname(), volunteer.getCity(), volunteer.getSkills());
+        return new VolunteerResponse(
+                volunteer.getId(),
+                volunteer.getFirstname(),
+                volunteer.getLastname(),
+                volunteer.getCity(),
+                volunteer.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList()));
     }
 
     public void deleleteVolunteerProfile(Long id) {
@@ -62,7 +68,7 @@ public class VolunteerProfileService {
                         volunteerProfile.getFirstname(),
                         volunteerProfile.getLastname(),
                         volunteerProfile.getCity(),
-                        volunteerProfile.getSkills()))
+                        volunteerProfile.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList())))
                 .collect(Collectors.toList());
 
         return allVolunteerProfiles;
@@ -72,14 +78,20 @@ public class VolunteerProfileService {
         VolunteerProfile volunteerProfile = volunteerRepo.findById(id).orElseThrow(() -> new VolunteerProfileNotFoundException("id="+id+", firstname="+request.firstname()+", lastname="+request.lastname()));
         if(request.phoneNumber() != null ) volunteerProfile.setPhoneNumber(request.phoneNumber());
         if(request.city() != null ) volunteerProfile.setCity(request.city());
+        if(!request.skillIds().isEmpty()) {
+            volunteerProfile.getSkills().clear();
+            List<Skill> newSkills = skillRepository.findAllById(request.skillIds());
+            volunteerProfile.setSkills(newSkills);
+        }
 
         VolunteerProfile saveVolunteerProfile = volunteerRepo.save(volunteerProfile);
+        List<SkillResponse> skillsDTO = saveVolunteerProfile.getSkills().stream().map(skill -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList());
         return new VolunteerResponse(
                 saveVolunteerProfile.getId(),
                 saveVolunteerProfile.getFirstname(),
                 saveVolunteerProfile.getLastname(),
                 saveVolunteerProfile.getCity(),
-                saveVolunteerProfile.getSkills()
+                skillsDTO
         );
     }
 
