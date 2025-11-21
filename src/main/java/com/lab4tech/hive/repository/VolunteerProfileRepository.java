@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface VolunteerProfileRepository extends JpaRepository<VolunteerProfile, Long> {
 
     Optional<VolunteerProfile> findByFirstnameAndLastname(String firstname, String lastname);
+
 }

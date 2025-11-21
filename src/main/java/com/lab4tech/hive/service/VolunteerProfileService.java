@@ -5,6 +5,7 @@ import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
 import com.lab4tech.hive.exception.VolunteerProfileAlreadyExistsException;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
+import com.lab4tech.hive.model.entity.Availability;
 import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
 import com.lab4tech.hive.repository.SkillRepository;
@@ -70,6 +71,7 @@ public class VolunteerProfileService {
         VolunteerProfile saveVolunteerProfile = volunteerRepo.save(volunteerProfile);
         return mapToVolunteerResponse(saveVolunteerProfile);
     }
+
 
     /*************************
      ** Utilitary functions **

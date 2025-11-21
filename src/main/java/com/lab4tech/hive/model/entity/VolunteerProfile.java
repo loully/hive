@@ -42,4 +42,7 @@ public class VolunteerProfile {
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> skills;
+
+    @OneToMany(mappedBy = "volunteerProfile")
+    private List<Availability> availabilities;
 }
