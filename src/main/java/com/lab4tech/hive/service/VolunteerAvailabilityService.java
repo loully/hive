@@ -8,6 +8,7 @@ import com.lab4tech.hive.model.entity.Availability;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
 import com.lab4tech.hive.repository.VolunteerAvailabilityRepository;
 import com.lab4tech.hive.repository.VolunteerProfileRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public class VolunteerAvailabilityService {
     }
 
     public List<AvailabilityResponse> getVolunteerAvailabilities(Long id) {
-        List<Availability> allVolunteerAvailabilities = new ArrayList<>();
+        List<Availability> allVolunteerAvailabilities;
         if(!volunteerProfileRepository.existsById(id)){
             throw new VolunteerProfileNotFoundException("id: %d".formatted(id));
         }
@@ -65,5 +66,13 @@ public class VolunteerAvailabilityService {
                                 availability.getVolunteerProfile().getId()))
         .collect(Collectors.toList());
         return result;
+    }
+
+    @Transactional
+    public void deleteVolunteerAvailability(Long volunteerId, Long availabilityId) {
+        if(!volunteerProfileRepository.existsById(volunteerId)){
+            throw new VolunteerProfileNotFoundException("id: %d".formatted(volunteerId));
+        }
+        volunteerAvailabilityRepository.deleteByIdAndVolunteerProfileId(availabilityId, volunteerId);
     }
 }

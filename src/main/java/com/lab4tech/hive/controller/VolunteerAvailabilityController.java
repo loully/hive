@@ -29,5 +29,11 @@ public class VolunteerAvailabilityController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{volunteerId}/availability/{availabilityId}")
+    public ResponseEntity deleteVolunteerAvailability(@PathVariable Long volunteerId, @PathVariable Long availabilityId){
+        volunteerAvailabilityService.deleteVolunteerAvailability(volunteerId, availabilityId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
