@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/volunteers")
 @RequiredArgsConstructor
@@ -19,6 +21,12 @@ public class VolunteerAvailabilityController {
     public ResponseEntity<AvailabilityResponse> createVolunteerAvailability(@PathVariable Long id, @RequestBody AvailabilityRequest request){
         AvailabilityResponse response = volunteerAvailabilityService.createVolunteerAvailability(id, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<List<AvailabilityResponse>> getVolunteerAvailabilities(@PathVariable Long id) {
+        List<AvailabilityResponse> result = volunteerAvailabilityService.getVolunteerAvailabilities(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 

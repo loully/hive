@@ -11,6 +11,10 @@ import com.lab4tech.hive.repository.VolunteerProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class VolunteerAvailabilityService {
@@ -42,5 +46,24 @@ public class VolunteerAvailabilityService {
                 newAvailability.getStartTime(),
                 newAvailability.getEndTime(),
                 newAvailability.getVolunteerProfile().getId());
+    }
+
+    public List<AvailabilityResponse> getVolunteerAvailabilities(Long id) {
+        List<Availability> allVolunteerAvailabilities = new ArrayList<>();
+        if(!volunteerProfileRepository.existsById(id)){
+            throw new VolunteerProfileNotFoundException("id: %d".formatted(id));
+        }
+        allVolunteerAvailabilities = volunteerAvailabilityRepository.findAllByVolunteerProfileId(id);
+
+        List<AvailabilityResponse> result = allVolunteerAvailabilities.stream()
+                .map(availability ->
+                        new AvailabilityResponse(
+                                availability.getId(),
+                                availability.getDate(),
+                                availability.getStartTime(),
+                                availability.getEndTime(),
+                                availability.getVolunteerProfile().getId()))
+        .collect(Collectors.toList());
+        return result;
     }
 }
