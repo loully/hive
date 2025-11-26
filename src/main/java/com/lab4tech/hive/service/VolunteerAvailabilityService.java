@@ -2,6 +2,7 @@ package com.lab4tech.hive.service;
 
 import com.lab4tech.hive.controller.dto.AvailabilityRequest;
 import com.lab4tech.hive.controller.dto.AvailabilityResponse;
+import com.lab4tech.hive.exception.OverlappingAvailabilityException;
 import com.lab4tech.hive.exception.VolunteerAvailabilityAlreadyExistsException;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
 import com.lab4tech.hive.model.entity.Availability;
@@ -30,6 +31,9 @@ public class VolunteerAvailabilityService {
                 availabilityRequest.startTime(),
                 availabilityRequest.endTime()))
             throw new VolunteerAvailabilityAlreadyExistsException(volunteerId, availabilityRequest.date(), availabilityRequest.startTime(), availabilityRequest.endTime());
+
+        //overlaping
+        if(volunteerAvailabilityRepository.existsOverlappingAvailability(volunteerId, availabilityRequest.date(), availabilityRequest.startTime(), availabilityRequest.endTime())) throw new OverlappingAvailabilityException(availabilityRequest.date(), availabilityRequest.startTime(), availabilityRequest.endTime());
 
         VolunteerProfile volunteerProfile = volunteerProfileRepository.findById(volunteerId).orElseThrow(() -> new VolunteerProfileNotFoundException(String.format("id:%s",volunteerId)));
 
