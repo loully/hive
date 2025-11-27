@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/users/**").permitAll()
                         .requestMatchers("/volunteers/**").permitAll()
                         .requestMatchers("/skills/**").permitAll()
+                        .requestMatchers("/missions/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN") // authorize admin for delete
                         .anyRequest().authenticated()    // other request must be authentified
                 );
