@@ -6,10 +6,9 @@ import com.lab4tech.hive.service.MissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/missions")
@@ -23,5 +22,30 @@ public class MissionController {
         MissionResponse response = missionService.createMission(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @GetMapping("/{missionId}")
+    public ResponseEntity<MissionResponse> getMission(@PathVariable Long missionId){
+        MissionResponse missionResponse = missionService.getMission(missionId);
+        return new ResponseEntity<>(missionResponse, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MissionResponse>> getAllMissions(){
+        List<MissionResponse> missionResponseList = missionService.getAllMissions();
+        return new ResponseEntity<>(missionResponseList, HttpStatus.OK);
+    }
+
+    @PutMapping("{missionId}")
+    public ResponseEntity<MissionResponse> updateMission(@PathVariable Long missionId, @RequestBody MissionRequest request){
+        MissionResponse result = missionService.updateMission(missionId, request);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{missionId}")
+    public ResponseEntity deleteMission(@PathVariable Long missionId){
+        missionService.deleteMission(missionId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }
