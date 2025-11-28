@@ -24,13 +24,7 @@ public class MissionService {
         if(missionRepository.existsByTitleAndDateAndStartTime(missionRequest.title(), missionRequest.date(), missionRequest.startTime())) throw new MissionAlreadyExistsException(String.format("title: %s, description: %s", missionRequest.title(), missionRequest.description()));
 
         Mission newMission = new Mission();
-        newMission.setTitle(missionRequest.title());
-        newMission.setDescription(missionRequest.description());
-        newMission.setLocation(missionRequest.location());
-        newMission.setDate(missionRequest.date());
-        newMission.setStartTime(missionRequest.startTime());
-        newMission.setEndTime(missionRequest.endTime());
-        newMission.setCapacity(missionRequest.capacity());
+        updateMissionFromRequest(missionRequest, newMission);
 
         newMission = missionRepository.save(newMission);
         return new MissionResponse(newMission.getId(),
@@ -77,13 +71,7 @@ public class MissionService {
     public MissionResponse updateMission(Long missionId, MissionRequest request) {
         Mission missionToUpdate = missionRepository.findById(missionId).orElseThrow(()-> new MissionNotFoundException(missionId));
 
-        missionToUpdate.setTitle(request.title());
-        missionToUpdate.setDescription(request.description());
-        missionToUpdate.setLocation(request.location());
-        missionToUpdate.setDate(request.date());
-        missionToUpdate.setStartTime(request.startTime());
-        missionToUpdate.setEndTime(request.endTime());
-        missionToUpdate.setCapacity(request.capacity());
+        updateMissionFromRequest(request, missionToUpdate);
 
         return new MissionResponse(missionToUpdate.getId(),
                 missionToUpdate.getTitle(),
@@ -94,5 +82,15 @@ public class MissionService {
                 missionToUpdate.getEndTime(),
                 missionToUpdate.getCapacity()
         );
+    }
+
+    private void updateMissionFromRequest(MissionRequest request, Mission missionToUpdate) {
+        missionToUpdate.setTitle(request.title());
+        missionToUpdate.setDescription(request.description());
+        missionToUpdate.setLocation(request.location());
+        missionToUpdate.setDate(request.date());
+        missionToUpdate.setStartTime(request.startTime());
+        missionToUpdate.setEndTime(request.endTime());
+        missionToUpdate.setCapacity(request.capacity());
     }
 }
