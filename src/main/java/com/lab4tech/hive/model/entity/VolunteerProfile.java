@@ -45,4 +45,12 @@ public class VolunteerProfile {
 
     @OneToMany(mappedBy = "volunteerProfile")
     private List<Availability> availabilities;
+
+    @ManyToMany
+    @JoinTable(
+            name = "volunteer_mission",
+            joinColumns = @JoinColumn(name = "volunteer_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "mission_id")
+    )
+    private List<Mission> missions;
 }

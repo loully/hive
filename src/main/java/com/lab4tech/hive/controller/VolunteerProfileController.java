@@ -52,4 +52,12 @@ public class VolunteerProfileController {
         return new ResponseEntity<>(volunteerResponse, HttpStatus.OK);
     }
 
+    //Add mission
+    @PostMapping("/{volunteerId}/missions/{missionId}")
+    public ResponseEntity<VolunteerResponse> addMissionToVolunteerProfile(@PathVariable Long volunteerId, @PathVariable Long missionId){
+        VolunteerResponse result = volunteerProfileService.addMissionToVolunteerProfile(volunteerId, missionId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
 }

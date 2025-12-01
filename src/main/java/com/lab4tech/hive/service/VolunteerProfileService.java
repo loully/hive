@@ -1,13 +1,18 @@
 package com.lab4tech.hive.service;
 
+import com.lab4tech.hive.controller.dto.MissionResponse;
 import com.lab4tech.hive.controller.dto.SkillResponse;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
+import com.lab4tech.hive.exception.MissionAlreadyAssignedException;
+import com.lab4tech.hive.exception.MissionNotFoundException;
 import com.lab4tech.hive.exception.VolunteerProfileAlreadyExistsException;
 import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
 import com.lab4tech.hive.model.entity.Availability;
+import com.lab4tech.hive.model.entity.Mission;
 import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
+import com.lab4tech.hive.repository.MissionRepository;
 import com.lab4tech.hive.repository.SkillRepository;
 import com.lab4tech.hive.repository.VolunteerProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +28,7 @@ public class VolunteerProfileService {
     //injection dependance of repository
     private final VolunteerProfileRepository volunteerRepo;
     private final SkillRepository skillRepository;
+    private final MissionRepository missionRepository;
 
     public VolunteerResponse createVolunteerProfile(VolunteerRequest request) {
         if(volunteerRepo.findByFirstnameAndLastname(request.firstname(), request.lastname()).isPresent())
@@ -73,18 +79,45 @@ public class VolunteerProfileService {
     }
 
 
+    public VolunteerResponse addMissionToVolunteerProfile(Long volunteerId, Long missionId) {
+        VolunteerProfile foundVolunteer = volunteerRepo.findById(volunteerId)
+                .orElseThrow(()-> new VolunteerProfileNotFoundException("with id: %d".formatted(volunteerId)));
+        Mission newMissionToAdd = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        if(foundVolunteer.getMissions().contains(newMissionToAdd))
+            throw new MissionAlreadyAssignedException(missionId, volunteerId);
+
+        foundVolunteer.getMissions().add(newMissionToAdd);
+
+        foundVolunteer = volunteerRepo.save(foundVolunteer);
+
+        return mapToVolunteerResponse(foundVolunteer);
+    }
+
     /*************************
      ** Utilitary functions **
      *************************/
 
     private VolunteerResponse mapToVolunteerResponse(VolunteerProfile volunteer) {
         List<SkillResponse> volunteerSkillsResponse = mapToSkillResponseList(volunteer.getSkills());
+        List<MissionResponse> volunteerMissionResponse = volunteer.getMissions().stream().map((mission) -> new MissionResponse(
+                mission.getId(),
+                mission.getTitle(),
+                mission.getDescription(),
+                mission.getLocation(),
+                mission.getDate(),
+                mission.getStartTime(),
+                mission.getEndTime(),
+                mission.getCapacity()))
+                .collect(Collectors.toList());
         return new VolunteerResponse(
                 volunteer.getId(),
                 volunteer.getFirstname(),
                 volunteer.getLastname(),
                 volunteer.getCity(),
-                volunteerSkillsResponse
+                volunteerSkillsResponse,
+                volunteerMissionResponse
         );
     }
 
@@ -97,5 +130,4 @@ public class VolunteerProfileService {
                                 skill.getDescription()))
                 .collect(Collectors.toList());
     }
-
 }

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -36,5 +37,8 @@ public class Mission {
 
     @Column(nullable = false)
     Integer capacity;
+
+    @ManyToMany(mappedBy = "missions")
+    List<VolunteerProfile> volunteerProfileList;
 
 }
