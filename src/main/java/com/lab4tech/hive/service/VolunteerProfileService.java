@@ -109,7 +109,9 @@ public class VolunteerProfileService {
                 mission.getDate(),
                 mission.getStartTime(),
                 mission.getEndTime(),
-                mission.getCapacity()))
+                mission.getCapacity(),
+                mission.getMissionStatus()
+        ))
                 .collect(Collectors.toList());
         return new VolunteerResponse(
                 volunteer.getId(),

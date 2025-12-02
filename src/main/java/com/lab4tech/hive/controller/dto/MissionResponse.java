@@ -1,5 +1,7 @@
 package com.lab4tech.hive.controller.dto;
 
+import com.lab4tech.hive.model.entity.MissionStatus;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -10,5 +12,6 @@ public record MissionResponse(Long id,
                               LocalDate date,
                               LocalTime startTime,
                               LocalTime endTime,
-                              Integer capacity) {
+                              Integer capacity,
+                              MissionStatus status) {
 }

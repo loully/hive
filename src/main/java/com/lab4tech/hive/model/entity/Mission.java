@@ -20,7 +20,7 @@ public class Mission {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = true)
+    @Column
     private String description;
 
     @Column(nullable = false)
@@ -37,6 +37,9 @@ public class Mission {
 
     @Column(nullable = false)
     Integer capacity;
+
+    @Column
+    MissionStatus missionStatus;
 
     @ManyToMany(mappedBy = "missions")
     List<VolunteerProfile> volunteerProfileList;

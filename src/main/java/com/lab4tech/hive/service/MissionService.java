@@ -34,7 +34,9 @@ public class MissionService {
                 newMission.getDate(),
                 newMission.getStartTime(),
                 newMission.getEndTime(),
-                newMission.getCapacity());
+                newMission.getCapacity(),
+                newMission.getMissionStatus()
+        );
     }
 
     public MissionResponse getMission(Long missionId){
@@ -46,7 +48,8 @@ public class MissionService {
                 foundMission.getDate(),
                 foundMission.getStartTime(),
                 foundMission.getEndTime(),
-                foundMission.getCapacity()
+                foundMission.getCapacity(),
+                foundMission.getMissionStatus()
         );
     }
 
@@ -58,7 +61,9 @@ public class MissionService {
                 mission.getDate(),
                 mission.getStartTime(),
                 mission.getEndTime(),
-                mission.getCapacity()))
+                mission.getCapacity(),
+                mission.getMissionStatus()
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -71,7 +76,8 @@ public class MissionService {
     public MissionResponse updateMission(Long missionId, MissionRequest request) {
         Mission missionToUpdate = missionRepository.findById(missionId).orElseThrow(()-> new MissionNotFoundException(missionId));
 
-        updateMissionFromRequest(request, missionToUpdate);
+        missionToUpdate = updateMissionFromRequest(request, missionToUpdate);
+        //missionToUpdate = missionRepository.save(missionToUpdate);
 
         return new MissionResponse(missionToUpdate.getId(),
                 missionToUpdate.getTitle(),
@@ -80,17 +86,20 @@ public class MissionService {
                 missionToUpdate.getDate(),
                 missionToUpdate.getStartTime(),
                 missionToUpdate.getEndTime(),
-                missionToUpdate.getCapacity()
+                missionToUpdate.getCapacity(),
+                missionToUpdate.getMissionStatus()
         );
     }
 
-    private void updateMissionFromRequest(MissionRequest request, Mission missionToUpdate) {
-        missionToUpdate.setTitle(request.title());
-        missionToUpdate.setDescription(request.description());
-        missionToUpdate.setLocation(request.location());
-        missionToUpdate.setDate(request.date());
-        missionToUpdate.setStartTime(request.startTime());
-        missionToUpdate.setEndTime(request.endTime());
-        missionToUpdate.setCapacity(request.capacity());
+    private Mission updateMissionFromRequest(MissionRequest request, Mission missionToUpdate) {
+        if(request.title() != null) missionToUpdate.setTitle(request.title());
+        if(request.description() != null) missionToUpdate.setDescription(request.description());
+        if(request.location() != null) missionToUpdate.setLocation(request.location());
+        if(request.date() != null) missionToUpdate.setDate(request.date());
+        if(request.startTime() != null) missionToUpdate.setStartTime(request.startTime());
+        if(request.endTime() != null) missionToUpdate.setEndTime(request.endTime());
+        if(request.capacity() != null) missionToUpdate.setCapacity(request.capacity());
+        if(request.status() != null) missionToUpdate.setMissionStatus(request.status());
+        return missionToUpdate;
     }
 }
