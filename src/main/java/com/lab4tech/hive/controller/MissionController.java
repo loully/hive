@@ -2,6 +2,7 @@ package com.lab4tech.hive.controller;
 
 import com.lab4tech.hive.controller.dto.MissionRequest;
 import com.lab4tech.hive.controller.dto.MissionResponse;
+import com.lab4tech.hive.controller.dto.MissionUpdateRequest;
 import com.lab4tech.hive.service.MissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,9 @@ public class MissionController {
         return new ResponseEntity<>(missionResponseList, HttpStatus.OK);
     }
 
+
     @PutMapping("{missionId}")
-    public ResponseEntity<MissionResponse> updateMission(@PathVariable Long missionId, @RequestBody MissionRequest request){
+    public ResponseEntity<MissionResponse> updateMission(@PathVariable Long missionId, @RequestBody MissionUpdateRequest request){
         MissionResponse result = missionService.updateMission(missionId, request);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

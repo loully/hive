@@ -2,6 +2,7 @@ package com.lab4tech.hive.service;
 
 import com.lab4tech.hive.controller.dto.MissionRequest;
 import com.lab4tech.hive.controller.dto.MissionResponse;
+import com.lab4tech.hive.controller.dto.MissionUpdateRequest;
 import com.lab4tech.hive.exception.MissionAlreadyExistsException;
 import com.lab4tech.hive.exception.MissionNotFoundException;
 import com.lab4tech.hive.model.entity.Mission;
@@ -24,7 +25,7 @@ public class MissionService {
         if(missionRepository.existsByTitleAndDateAndStartTime(missionRequest.title(), missionRequest.date(), missionRequest.startTime())) throw new MissionAlreadyExistsException(String.format("title: %s, description: %s", missionRequest.title(), missionRequest.description()));
 
         Mission newMission = new Mission();
-        updateMissionFromRequest(missionRequest, newMission);
+        newMission = updateMissionFromRequest(missionRequest, newMission);
 
         newMission = missionRepository.save(newMission);
         return new MissionResponse(newMission.getId(),
@@ -73,11 +74,11 @@ public class MissionService {
     }
 
     @Transactional // dirty checking
-    public MissionResponse updateMission(Long missionId, MissionRequest request) {
+    public MissionResponse updateMission(Long missionId, MissionUpdateRequest request) {
         Mission missionToUpdate = missionRepository.findById(missionId).orElseThrow(()-> new MissionNotFoundException(missionId));
 
-        missionToUpdate = updateMissionFromRequest(request, missionToUpdate);
-        //missionToUpdate = missionRepository.save(missionToUpdate);
+        //missionToUpdate = updateMissionFromRequest(request, missionToUpdate);
+        missionToUpdate = missionRepository.save(missionToUpdate);
 
         return new MissionResponse(missionToUpdate.getId(),
                 missionToUpdate.getTitle(),

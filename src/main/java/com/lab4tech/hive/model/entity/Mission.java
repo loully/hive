@@ -38,7 +38,7 @@ public class Mission {
     @Column(nullable = false)
     Integer capacity;
 
-    @Column
+    @Column(nullable = false)
     MissionStatus missionStatus;
 
     @ManyToMany(mappedBy = "missions")
