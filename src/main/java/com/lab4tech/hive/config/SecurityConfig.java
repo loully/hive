@@ -3,7 +3,6 @@ package com.lab4tech.hive.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection to REST API ** Should handle it with classical frontend **
-                .httpBasic(Customizer.withDefaults()) // Disable default config
+                .httpBasic(AbstractHttpConfigurer::disable) // Disable default config
                 .authorizeHttpRequests(authorize -> authorize   // Conf HTTP request authorisations
                         .requestMatchers(HttpMethod.GET,"/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/users/**").permitAll()
@@ -34,6 +33,9 @@ public class SecurityConfig {
                         .requestMatchers("/skills/**").permitAll()
                         .requestMatchers("/missions/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN") // authorize admin for delete
+                        .requestMatchers("/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()    // other request must be authentified
                 );
         return http.build();
