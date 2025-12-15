@@ -4,10 +4,7 @@ import com.lab4tech.hive.controller.dto.MissionResponse;
 import com.lab4tech.hive.controller.dto.SkillResponse;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
-import com.lab4tech.hive.exception.MissionAlreadyAssignedException;
-import com.lab4tech.hive.exception.MissionNotFoundException;
-import com.lab4tech.hive.exception.VolunteerProfileAlreadyExistsException;
-import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
+import com.lab4tech.hive.exception.*;
 import com.lab4tech.hive.model.entity.Availability;
 import com.lab4tech.hive.model.entity.Mission;
 import com.lab4tech.hive.model.entity.Skill;
@@ -87,6 +84,9 @@ public class VolunteerProfileService {
 
         if(foundVolunteer.getMissions().contains(newMissionToAdd))
             throw new MissionAlreadyAssignedException(missionId, volunteerId);
+        if (newMissionToAdd.getCapacity() != null && newMissionToAdd.getVolunteerProfileList().size() >= newMissionToAdd.getCapacity()) {
+            throw new MissionFullException("Mission titled : '" + newMissionToAdd.getTitle() + "' is already fulled.");
+        }
 
         foundVolunteer.getMissions().add(newMissionToAdd);
 
