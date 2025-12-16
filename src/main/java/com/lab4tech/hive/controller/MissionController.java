@@ -49,5 +49,11 @@ public class MissionController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /** Volunteer Missions **/
+    @GetMapping("/volunteer/{volunteerId}")
+    public ResponseEntity<List<MissionResponse>> getAllMissionsByVolunteer(@PathVariable Long volunteerId){
+        List<MissionResponse> allMissionsByVolunteer =  missionService.getAllMissionsByVolunteer(volunteerId);
+        return new ResponseEntity<>(allMissionsByVolunteer, HttpStatus.OK);
+    }
 
 }

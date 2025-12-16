@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,9 +86,24 @@ public class VolunteerProfileService {
 
         if(foundVolunteer.getMissions().contains(newMissionToAdd))
             throw new MissionAlreadyAssignedException(missionId, volunteerId);
-        if (newMissionToAdd.getCapacity() != null && newMissionToAdd.getVolunteerProfileList().size() >= newMissionToAdd.getCapacity()) {
-            throw new MissionFullException("Mission titled : '" + newMissionToAdd.getTitle() + "' is already fulled.");
-        }
+        //Mission full
+        if (newMissionToAdd.getCapacity() != null && newMissionToAdd.getVolunteerProfileList().size() >= newMissionToAdd.getCapacity())
+            throw new MissionFullException("Mission titled : '" + newMissionToAdd.getTitle() + "' is already full.");
+        //Mission expired date
+        if(newMissionToAdd.getDate().isBefore(LocalDate.now()))
+            throw new MissionExpiredException("Mission with title :"+newMissionToAdd.getTitle()+" is expired.");
+
+        //Volunteer is not available
+        if(!foundVolunteer.getAvailabilities()
+                .stream()
+                .anyMatch(
+                a ->
+                        (a.getDate() == newMissionToAdd.getDate())
+                                && ((newMissionToAdd.getStartTime().isAfter(a.getStartTime()) && newMissionToAdd.getStartTime().isBefore(a.getEndTime()))
+                                || (newMissionToAdd.getEndTime().isAfter(a.getStartTime()) && newMissionToAdd.getEndTime().isBefore(a.getEndTime())))
+                ))
+                throw new VolunteerNotAvailableException("Volunteer named : %s%s is not available for the mission %s.".formatted(foundVolunteer.getFirstname(), foundVolunteer.getLastname(), newMissionToAdd.getTitle()));
+
 
         foundVolunteer.getMissions().add(newMissionToAdd);
 
@@ -94,6 +111,15 @@ public class VolunteerProfileService {
 
         return mapToVolunteerResponse(foundVolunteer);
     }
+
+    //Todo : add autorisation for admin
+    public void deleteMissionToVolunteerProfile(Long volunteerId, Long missionId) {
+        VolunteerProfile foundVolunteer = volunteerRepo.findById(volunteerId).orElseThrow(() -> new VolunteerProfileNotFoundException(" id:%s".formatted(volunteerId)));
+        Mission missionToDelete = missionRepository.findById(missionId).orElseThrow(NoSuchElementException::new);
+        foundVolunteer.getMissions().remove(missionToDelete);
+        volunteerRepo.save(foundVolunteer);
+    }
+
 
     /*************************
      ** Utilitary functions **

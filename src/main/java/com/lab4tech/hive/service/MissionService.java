@@ -5,8 +5,11 @@ import com.lab4tech.hive.controller.dto.MissionResponse;
 import com.lab4tech.hive.controller.dto.MissionUpdateRequest;
 import com.lab4tech.hive.exception.MissionAlreadyExistsException;
 import com.lab4tech.hive.exception.MissionNotFoundException;
+import com.lab4tech.hive.exception.VolunteerProfileNotFoundException;
 import com.lab4tech.hive.model.entity.Mission;
+import com.lab4tech.hive.model.entity.VolunteerProfile;
 import com.lab4tech.hive.repository.MissionRepository;
+import com.lab4tech.hive.repository.VolunteerProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class MissionService {
 
     private final MissionRepository missionRepository;
+    private final VolunteerProfileRepository volunteerProfileRepository;
 
     public MissionResponse createMission(MissionRequest missionRequest){
 
@@ -92,6 +96,7 @@ public class MissionService {
         );
     }
 
+    /******* Utility methods *******/
     private Mission updateMissionFromRequest(MissionRequest request, Mission missionToUpdate) {
         if(request.title() != null) missionToUpdate.setTitle(request.title());
         if(request.description() != null) missionToUpdate.setDescription(request.description());
@@ -102,5 +107,25 @@ public class MissionService {
         if(request.capacity() != null) missionToUpdate.setCapacity(request.capacity());
         if(request.status() != null) missionToUpdate.setMissionStatus(request.status());
         return missionToUpdate;
+    }
+
+    /** Missions by Volunteer **/
+
+    public List<MissionResponse> getAllMissionsByVolunteer(Long volunteerId){
+        VolunteerProfile volunteer = volunteerProfileRepository.findById(volunteerId).orElseThrow(() -> new VolunteerProfileNotFoundException("id: %s".formatted(volunteerId)));
+        List<Mission> allMissions = volunteer.getMissions();
+        return allMissions.stream()
+                .map(mission ->
+                        new MissionResponse(
+                                mission.getId(),
+                                mission.getTitle(),
+                                mission.getDescription(),
+                                mission.getLocation(),
+                                mission.getDate(),
+                                mission.getStartTime(),
+                                mission.getEndTime(),
+                                mission.getCapacity(),
+                                mission.getMissionStatus()))
+                .collect(Collectors.toList());
     }
 }

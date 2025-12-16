@@ -21,6 +21,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    //Todo : deletion request may be authorised only for admin
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

@@ -25,7 +25,6 @@ public class VolunteerProfileController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    //Get volunteer
     @GetMapping("/{id}")
     public ResponseEntity<VolunteerResponse> getVolunteerProfile(@PathVariable Long id){
         VolunteerResponse foundVolunteer = volunteerProfileService.getVolunteerProfile(id);
@@ -52,12 +51,22 @@ public class VolunteerProfileController {
         return new ResponseEntity<>(volunteerResponse, HttpStatus.OK);
     }
 
+    /**** VOLUNTEER MISSION ****/
     //Add mission
     @PostMapping("/{volunteerId}/missions/{missionId}")
     public ResponseEntity<VolunteerResponse> addMissionToVolunteerProfile(@PathVariable Long volunteerId, @PathVariable Long missionId){
         VolunteerResponse result = volunteerProfileService.addMissionToVolunteerProfile(volunteerId, missionId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    //Delete mission
+    @DeleteMapping("/{volunteerId}/missions/{missionId}")
+    public ResponseEntity deleteMissionToVolunteerProfile(@PathVariable Long volunteerId, @PathVariable Long missionId){
+        volunteerProfileService.deleteMissionToVolunteerProfile(volunteerId, missionId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 }
