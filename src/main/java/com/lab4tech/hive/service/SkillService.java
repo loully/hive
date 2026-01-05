@@ -34,8 +34,7 @@ public class SkillService {
     }
 
     public List<SkillResponse> getAllSkills() {
-        List<SkillResponse>result = skillRepository.findAll().stream().map((skill) -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList());
-        return result;
+        return skillRepository.findAll().stream().map((skill) -> new SkillResponse(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toList());
     }
 
     public SkillResponse updateSkill(int id, SkillRequest request){

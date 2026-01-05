@@ -59,10 +59,9 @@ public class AppUserService implements UserDetailsService {
 
     public List<AppUserResponse> findAllUsers(){
         List<AppUser> appUsers = appUserRepository.findAll();
-        List<AppUserResponse> result = appUsers.stream()
+        return appUsers.stream()
                 .map(appUser -> new AppUserResponse(appUser.getId(), appUser.getEmail(), appUser.getRole()))
                 .collect(Collectors.toList());
-        return result;
     }
 
     public AppUserResponse updateUser (long id, AppUserRequest user){

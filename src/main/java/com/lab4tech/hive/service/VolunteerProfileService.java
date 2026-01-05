@@ -5,7 +5,6 @@ import com.lab4tech.hive.controller.dto.SkillResponse;
 import com.lab4tech.hive.controller.dto.VolunteerRequest;
 import com.lab4tech.hive.controller.dto.VolunteerResponse;
 import com.lab4tech.hive.exception.*;
-import com.lab4tech.hive.model.entity.Availability;
 import com.lab4tech.hive.model.entity.Mission;
 import com.lab4tech.hive.model.entity.Skill;
 import com.lab4tech.hive.model.entity.VolunteerProfile;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,12 +54,10 @@ public class VolunteerProfileService {
     }
 
     public List<VolunteerResponse> getAllVolunteerProfiles() {
-        List<VolunteerResponse> allVolunteerProfiles = volunteerRepo.findAll()
+        return volunteerRepo.findAll()
                 .stream()
                 .map(this::mapToVolunteerResponse)
                 .collect(Collectors.toList());
-
-        return allVolunteerProfiles;
     }
 
     public VolunteerResponse updateVolunteerProfile(Long id, VolunteerRequest request) {
@@ -94,13 +90,12 @@ public class VolunteerProfileService {
             throw new MissionExpiredException("Mission with title :"+newMissionToAdd.getTitle()+" is expired.");
 
         //Volunteer is not available
-        if(!foundVolunteer.getAvailabilities()
-                .stream()
-                .anyMatch(
+        if(foundVolunteer.getAvailabilities().stream()
+                .noneMatch(
                 a ->
-                        (a.getDate() == newMissionToAdd.getDate())
-                                && ((newMissionToAdd.getStartTime().isAfter(a.getStartTime()) && newMissionToAdd.getStartTime().isBefore(a.getEndTime()))
-                                || (newMissionToAdd.getEndTime().isAfter(a.getStartTime()) && newMissionToAdd.getEndTime().isBefore(a.getEndTime())))
+                        (a.getDate().equals(newMissionToAdd.getDate()))
+                                && ((newMissionToAdd.getStartTime().isAfter(a.getStartTime()) || newMissionToAdd.getStartTime().equals(a.getStartTime()))
+                                && (newMissionToAdd.getEndTime().isBefore(a.getEndTime()) || newMissionToAdd.getEndTime().equals(a.getEndTime())))
                 ))
                 throw new VolunteerNotAvailableException("Volunteer named : %s%s is not available for the mission %s.".formatted(foundVolunteer.getFirstname(), foundVolunteer.getLastname(), newMissionToAdd.getTitle()));
 
@@ -112,10 +107,10 @@ public class VolunteerProfileService {
         return mapToVolunteerResponse(foundVolunteer);
     }
 
-    //Todo : add autorisation for admin
+    //@PreAuthorize("hasRole('ADMIN')") // Authorization for admin can be added here if needed
     public void deleteMissionToVolunteerProfile(Long volunteerId, Long missionId) {
         VolunteerProfile foundVolunteer = volunteerRepo.findById(volunteerId).orElseThrow(() -> new VolunteerProfileNotFoundException(" id:%s".formatted(volunteerId)));
-        Mission missionToDelete = missionRepository.findById(missionId).orElseThrow(NoSuchElementException::new);
+        Mission missionToDelete = missionRepository.findById(missionId).orElseThrow(() -> new MissionNotFoundException(missionId));
         foundVolunteer.getMissions().remove(missionToDelete);
         volunteerRepo.save(foundVolunteer);
     }
