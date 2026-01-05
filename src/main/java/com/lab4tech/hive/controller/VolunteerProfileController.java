@@ -39,7 +39,7 @@ public class VolunteerProfileController {
 
     //Delete volunteer
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteVolunteerProfile(@PathVariable Long id){
+    public ResponseEntity<Void> deleteVolunteerProfile(@PathVariable Long id){
         volunteerProfileService.deleleteVolunteerProfile(id);
         return ResponseEntity.noContent().build();
     }
@@ -61,7 +61,7 @@ public class VolunteerProfileController {
 
     //Delete mission
     @DeleteMapping("/{volunteerId}/missions/{missionId}")
-    public ResponseEntity deleteMissionToVolunteerProfile(@PathVariable Long volunteerId, @PathVariable Long missionId){
+    public ResponseEntity<Void> deleteMissionToVolunteerProfile(@PathVariable Long volunteerId, @PathVariable Long missionId){
         volunteerProfileService.deleteMissionToVolunteerProfile(volunteerId, missionId);
         return ResponseEntity.noContent().build();
     }

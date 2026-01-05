@@ -30,7 +30,7 @@ public class VolunteerAvailabilityController {
     }
 
     @DeleteMapping("/{volunteerId}/availability/{availabilityId}")
-    public ResponseEntity deleteVolunteerAvailability(@PathVariable Long volunteerId, @PathVariable Long availabilityId){
+    public ResponseEntity<Void> deleteVolunteerAvailability(@PathVariable Long volunteerId, @PathVariable Long availabilityId){
         volunteerAvailabilityService.deleteVolunteerAvailability(volunteerId, availabilityId);
         return ResponseEntity.noContent().build();
     }

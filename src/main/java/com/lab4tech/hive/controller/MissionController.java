@@ -44,7 +44,7 @@ public class MissionController {
     }
 
     @DeleteMapping("/{missionId}")
-    public ResponseEntity deleteMission(@PathVariable Long missionId){
+    public ResponseEntity<Void> deleteMission(@PathVariable Long missionId){
         missionService.deleteMission(missionId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
