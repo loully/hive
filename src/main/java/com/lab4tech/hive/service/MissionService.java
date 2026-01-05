@@ -29,7 +29,7 @@ public class MissionService {
         if(missionRepository.existsByTitleAndDateAndStartTime(missionRequest.title(), missionRequest.date(), missionRequest.startTime())) throw new MissionAlreadyExistsException(String.format("title: %s, description: %s", missionRequest.title(), missionRequest.description()));
 
         Mission newMission = new Mission();
-        newMission = updateMissionFromRequest(missionRequest, newMission);
+        updateMissionFromRequest(missionRequest, newMission);
 
         newMission = missionRepository.save(newMission);
         return new MissionResponse(newMission.getId(),
@@ -81,7 +81,7 @@ public class MissionService {
     public MissionResponse updateMission(Long missionId, MissionUpdateRequest request) {
         Mission missionToUpdate = missionRepository.findById(missionId).orElseThrow(()-> new MissionNotFoundException(missionId));
 
-        //missionToUpdate = updateMissionFromRequest(request, missionToUpdate);
+        updateMissionFromRequest(request, missionToUpdate);
         missionToUpdate = missionRepository.save(missionToUpdate);
 
         return new MissionResponse(missionToUpdate.getId(),
@@ -98,6 +98,18 @@ public class MissionService {
 
     /******* Utility methods *******/
     private Mission updateMissionFromRequest(MissionRequest request, Mission missionToUpdate) {
+        if(request.title() != null) missionToUpdate.setTitle(request.title());
+        if(request.description() != null) missionToUpdate.setDescription(request.description());
+        if(request.location() != null) missionToUpdate.setLocation(request.location());
+        if(request.date() != null) missionToUpdate.setDate(request.date());
+        if(request.startTime() != null) missionToUpdate.setStartTime(request.startTime());
+        if(request.endTime() != null) missionToUpdate.setEndTime(request.endTime());
+        if(request.capacity() != null) missionToUpdate.setCapacity(request.capacity());
+        if(request.status() != null) missionToUpdate.setMissionStatus(request.status());
+        return missionToUpdate;
+    }
+
+    private Mission updateMissionFromRequest(MissionUpdateRequest request, Mission missionToUpdate) {
         if(request.title() != null) missionToUpdate.setTitle(request.title());
         if(request.description() != null) missionToUpdate.setDescription(request.description());
         if(request.location() != null) missionToUpdate.setLocation(request.location());
