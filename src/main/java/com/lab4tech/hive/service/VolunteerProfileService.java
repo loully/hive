@@ -89,15 +89,15 @@ public class VolunteerProfileService {
         if(newMissionToAdd.getDate().isBefore(LocalDate.now()))
             throw new MissionExpiredException("Mission with title :"+newMissionToAdd.getTitle()+" is expired.");
 
-        //Volunteer is not available
-        if(foundVolunteer.getAvailabilities().stream()
-                .noneMatch(
+        //Check if volunteer has availability matching the mission date and time -> throw error
+        boolean isAvailable = foundVolunteer.getAvailabilities().stream()
+                .anyMatch(
                 a ->
                         (a.getDate().equals(newMissionToAdd.getDate()))
-                                && ((newMissionToAdd.getStartTime().isAfter(a.getStartTime()) || newMissionToAdd.getStartTime().equals(a.getStartTime()))
-                                && (newMissionToAdd.getEndTime().isBefore(a.getEndTime()) || newMissionToAdd.getEndTime().equals(a.getEndTime())))
-                ))
-                throw new VolunteerNotAvailableException("Volunteer named : %s%s is not available for the mission %s.".formatted(foundVolunteer.getFirstname(), foundVolunteer.getLastname(), newMissionToAdd.getTitle()));
+                                && !newMissionToAdd.getStartTime().isBefore(a.getStartTime())
+                                && !newMissionToAdd.getEndTime().isAfter(a.getEndTime())
+                );
+                if(!isAvailable)                throw new VolunteerNotAvailableException("Volunteer named : %s%s is not available for the mission %s.".formatted(foundVolunteer.getFirstname(), foundVolunteer.getLastname(), newMissionToAdd.getTitle()));
 
 
         foundVolunteer.getMissions().add(newMissionToAdd);
