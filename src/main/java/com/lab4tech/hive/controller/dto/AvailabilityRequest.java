@@ -5,9 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record AvailabilityRequest(
-        @NotBlank LocalDate date,
-        @NotBlank LocalTime startTime,
-        @NotBlank LocalTime endTime,
+        @NotBlank(message = "Date is required")
+        LocalDate date,
+        @NotBlank(message = "Start time is required")
+        LocalTime startTime,
+        @NotBlank(message = "End time is required") LocalTime endTime,
         Long volunteerProfileId
 ) {
 }
